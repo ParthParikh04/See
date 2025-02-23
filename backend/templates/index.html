@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>See++</title>
+  <link rel="stylesheet" href="static/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="content-container">
+      <video id="videoFeed" autoplay playsinline></video>
+      <p id="text"></p>
+    </div>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <div class="button-container">
+      <button id="button1" class="button" aria-label="Text Recognition">
+        <i class="fa-solid fa-font"></i>
+      </button>
+      <button id="button2" class="button" aria-label="Image Recognition">
+        <i class="fa-solid fa-image"></i>
+      </button>
+      <button id="button3" class="button" aria-label="Voice Recognition">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+      <button id="back-button" class="button" aria-label="Go Back" style="display:none;">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      <button id="flip-button" class="button" aria-label="Flip Camera">
+        <i class="fa-solid fa-camera-rotate"></i>
+      </button>
+          
+    </div>
+  </div>
+  <script src="static/script.js"></script>
+</body>
+</html>
