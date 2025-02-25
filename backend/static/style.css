@@ -1,0 +1,59 @@
+/* Ensure the website adapts to all screen sizes */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-size: 16px;
+}
+
+/* Make the container responsive */
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  text-align: center;
+}
+
+/* Make the text block responsive */
+#text {
+  width: 90%;
+  max-width: 600px; /* Prevent it from being too wide on large screens */
+  max-height: 80vh;
+  padding: 20px;
+  font-size: 1.2rem;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: aliceblue;
+  border-radius: 10px;
+  overflow-y: auto;
+}
+
+/* Buttons: Ensure they are large enough for touch interactions */
+.button-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  position: absolute;
+  bottom: 5%;
+  gap: 10px; /* Ensure spacing between buttons */
+}
+
+.button {
+  font-size: 1.5rem;
+  color: white;
+  background-color: black;
+  border: 2px solid white;  
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Increase button size for smaller
