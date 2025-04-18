@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import base64
 import tempfile
-from gemini import process_query
+from backend.gemini import process_query
 import os
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
@@ -35,11 +35,9 @@ def submit_query():
 
         os.remove(f.name)  # Clean up after processing
 
-        print(response)
-
         return jsonify({"response": response})
     except Exception as e:
-        print("Error in /submit_query:", e)  # Print error to console for debugging
+        # print("Error in /submit_query:", e)  # Print error to console for debugging
         return jsonify({"response": "Server error occurred."}), 500
 
 if __name__ == "__main__":
