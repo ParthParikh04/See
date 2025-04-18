@@ -14,7 +14,6 @@ def home():
 
 @app.route('/submit_query', methods=['POST'])
 def submit_query():
-    print("HI")
     try:
         data = request.get_json()
         if not data:
@@ -35,6 +34,8 @@ def submit_query():
             response = process_query(f.name, user_query)
 
         os.remove(f.name)  # Clean up after processing
+
+        print(response)
 
         return jsonify({"response": response})
     except Exception as e:

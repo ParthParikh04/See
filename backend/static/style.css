@@ -19,41 +19,67 @@ body, html {
   text-align: center;
 }
 
-/* Make the text block responsive */
 #text {
   width: 90%;
-  max-width: 600px; /* Prevent it from being too wide on large screens */
+  max-width: 600px;
   max-height: 80vh;
   padding: 20px;
-  font-size: 1.2rem;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.8);
+  font-size: 2rem;
+  line-height: 1.6;
+  text-align: left; 
+  background-color: rgba(0, 0, 0, 0.85);
   color: aliceblue;
   border-radius: 10px;
   overflow-y: auto;
+  white-space: pre-wrap;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  padding-bottom: 40px;
 }
 
-/* Buttons: Ensure they are large enough for touch interactions */
 .button-container {
   display: flex;
-  justify-content: center;
-  width: 100%;
+  justify-content: space-between;
+  align-items: center;
   position: absolute;
-  bottom: 5%;
-  gap: 10px; /* Ensure spacing between buttons */
+  bottom: 0;
+  width: 100%;
+  background-color: black;
 }
 
 .button {
-  font-size: 1.5rem;
+  flex: 1; /* Makes each button take up equal space */
+  font-size: 5rem;
+  padding: 24px 0;
   color: white;
   background-color: black;
-  border: 2px solid white;  
-  height: 50px;
-  width: 50px;
-  border-radius: 50%;
+  border: none;
+  border-top: 2px solid white;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100px;
+  transition: background-color 0.2s ease;
 }
 
-/* Increase button size for smaller
+.button i {
+  pointer-events: none; /* So clicking the icon triggers the button */
+}
+
+.button:active {
+  background-color: #222;
+}
+
+
+/* Improve touch target spacing and make sure it's responsive */
+@media (max-width: 480px) {
+    .button {
+      height: 160px;
+      font-size: 4rem;
+    }
+  }
+  
+
+  .button-container {
+    gap: 12px;
+  }

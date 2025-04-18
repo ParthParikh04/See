@@ -8,16 +8,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const backButton = document.getElementById("back-button");
 
   let currentStream = null;
-  let currentFacingMode = "environment"; // Default to rear camera
+  let currentFacingMode = "environment";
 
-  // Stop any active video stream
+  function displayError(message) {
+    text.style.display = "block";
+    text.textContent = message;
+    text.scrollTop = text.scrollHeight;
+    speakText(message);
+  }
+
   function stopCurrentStream() {
     if (currentStream) {
       currentStream.getTracks().forEach(track => track.stop());
     }
   }
 
-  // Start the webcam with specified facing mode
   function startWebcam(facingMode = "environment") {
     stopCurrentStream();
 
@@ -26,14 +31,14 @@ document.addEventListener("DOMContentLoaded", function () {
         currentStream = stream;
         video.srcObject = stream;
         video.style.display = "block";
+        video.style.transform = facingMode === "user" ? "scaleX(-1)" : "scaleX(1)";
       })
       .catch((error) => {
         console.error("Error accessing webcam:", error);
-        text.textContent = "Unable to access webcam.";
+        displayError("Unable to access webcam.");
       });
   }
 
-  // Flip camera function
   function flipCamera() {
     currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
     startWebcam(currentFacingMode);
@@ -46,9 +51,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // ✅ Updated show function to stop speech when back arrow is clicked
   function show() {
-    window.speechSynthesis.cancel(); // 🛑 Stop any ongoing speech
+    window.speechSynthesis.cancel();
     video.style.display = "block";
     button1.style.display = "inline-flex";
     button2.style.display = "inline-flex";
@@ -58,15 +62,20 @@ document.addEventListener("DOMContentLoaded", function () {
     text.style.display = "none";
   }
 
-  function replace() {
-    window.speechSynthesis.cancel(); // 🛑 Stop speech before starting new one
+  function replace(query) {
+    window.speechSynthesis.cancel();
     video.style.display = "none";
     button1.style.display = "none";
     button2.style.display = "none";
     button3.style.display = "none";
     flipButton.style.display = "none";
     backButton.style.display = "inline-flex";
-    text.style.display = "block";
+    text.style.display = "none";
+
+    if (video.readyState < 2) {
+      video.addEventListener("loadeddata", () => replace(query), { once: true });
+      return;
+    }
 
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
@@ -79,32 +88,80 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch("/submit_query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ frame: dataURL, query: "Describe this image briefly but with necessary details." }),
+      body: JSON.stringify({ frame: dataURL, query: query }),
     })
       .then((response) => response.json())
       .then((result) => {
+        text.style.display = "block";
         text.textContent = result.response;
-        speakText(result.response); // Start speech after getting the response
+        text.scrollTop = text.scrollHeight;
+        speakText(result.response);
       })
       .catch((error) => {
         console.error("Error:", error);
-        text.textContent = "An error occurred.";
+        displayError("An error occurred.");
       });
   }
 
-  // ✅ Event listeners
-  button1.addEventListener("click", replace);
-  button2.addEventListener("click", replace);
-  button3.addEventListener("click", replace);
+  // Event listeners
+  button1.addEventListener("click", () => 
+    replace("Give me the only text in this image without any introduction or any other information.")
+  );
+
+  button2.addEventListener("click", () => 
+    replace("Describe this image briefly but with necessary details. Do not give any preface. Just give me the description.")
+  );
+
+  button3.addEventListener("click", () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      displayError("Speech recognition is not supported in this browser.");
+      return;
+    }
+  
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+  
+    // Show listening message
+    text.style.display = "block";
+    text.textContent = "Listening...";
+    text.scrollTop = text.scrollHeight;
+    console.log("Listening...");
+  
+    recognition.onresult = function (event) {
+      const spokenText = event.results[0][0].transcript;
+      console.log("Heard:", spokenText);
+  
+      // Give time for "Listening..." to render
+      setTimeout(() => replace(spokenText), 100);
+    };
+  
+    recognition.onerror = function (event) {
+      if (event.error === "no-speech") {
+        displayError("No speech detected.");
+      } else {
+        console.error("Speech recognition error:", event.error);
+        displayError("Sorry, I didn't catch that. Try again.");
+      }
+    };
+  
+    recognition.onend = function () {
+      console.log("Speech recognition ended.");
+    };
+  
+    recognition.start();
+  });  
+
   backButton.addEventListener("click", show);
   flipButton.addEventListener("click", flipCamera);
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
-      replace();
+      replace("Describe this image briefly but with necessary details.");
     }
   });
 
-  // Start with rear camera by default
   startWebcam(currentFacingMode);
 });
