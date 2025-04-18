@@ -19,8 +19,7 @@
 ### 1. Clone this repository
 
 ```bash
-git clone https://github.com/yourusername/seeplusplus.git
-cd seeplusplus
+git clone https://github.com/ParthParikh04/See.git
 ```
 
 ### 2. Create a virtual environment
