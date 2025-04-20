@@ -145,6 +145,7 @@ Want to test **See++** on your phone? You can use [ngrok](https://ngrok.com/) to
 
 ## 👥 Contributors
 
+- **Parth Parikh**
 - **Andria Wang**
 - **Colby Brown**
 - **James Martin**
