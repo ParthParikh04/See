@@ -29,6 +29,8 @@ python -m venv venv
 source venv/bin/activate 
 ```
 
+**Note**: Make sure this virtual environment (venv) is created within the project directory.
+
 ### 3. Install dependencies
 
 ```bash
