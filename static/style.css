@@ -129,4 +129,13 @@ body, html {
     height: 160px;
     font-size: 4rem;
   }
+
+  .button-container {
+    height: 160px;
+  }
+
+  #statusText, #text {
+    padding-bottom: 180px; /* ensure text doesn't get covered */
+  }
+}
 }
