@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>See++ Instructions</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='splash.css') }}">
+  <script defer src="{{ url_for('static', filename='splash.js') }}"></script>
+</head>
+<body id="splashBody">
+  <div class="instructions">
+    <h1>Welcome to See++</h1>
+    <p>
+      This app lets you interact with images and live video in three ways: 
+      <br>• Text recognition  
+      <br>• Image recognition  
+      <br>• Voice commands
+    </p>
+    <span>Click the button below to have this read aloud or anywhere else to proceed to the app</span>
+    <button id="readButton">Read Instructions</button>
+  </div>
+</body>
+</html>

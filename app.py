@@ -9,7 +9,11 @@ app = Flask(__name__, template_folder='templates', static_folder='static')
 CORS(app)
 
 @app.route("/")
-def home():
+def splash():
+    return render_template("splash.html")
+
+@app.route("/app")
+def app_page():
     return render_template("index.html")
 
 @app.route('/submit_query', methods=['POST'])
@@ -33,11 +37,10 @@ def submit_query():
             f.flush()
             response = process_query(f.name, user_query)
 
-        os.remove(f.name)  # Clean up after processing
+        os.remove(f.name) 
 
         return jsonify({"response": response})
     except Exception as e:
-        # print("Error in /submit_query:", e)  # Print error to console for debugging
         return jsonify({"response": "Server error occurred."}), 500
 
 if __name__ == "__main__":

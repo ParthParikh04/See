@@ -15,9 +15,7 @@ def process_query_file(file, query):
     return result.text
 
 def process_query(filename, query):
-    myfile = PIL.Image.open(filename) # genai.upload_file(filename)
-
-    print(myfile)
+    myfile = PIL.Image.open(filename)
 
     model = genai.GenerativeModel("gemini-1.5-flash-latest")
 

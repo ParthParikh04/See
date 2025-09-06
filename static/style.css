@@ -3,20 +3,66 @@ body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;
   font-size: 16px;
+  background-color: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
 }
 
-/* Make the container responsive */
+/* Back to Splash Button */
+#backToSplash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px 0;
+  font-size: 1.2rem;
+  background-color: #222;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* Container for video and text */
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-color: black;
   text-align: center;
+  padding-top: 60px; /* space for back button */
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Video feed */
+#videoFeed {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Status message styling */
+#statusText {
+  width: 90%;
+  max-width: 600px;
+  margin-top: 10px;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  text-align: center;
+  color: aliceblue;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 10px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 #text {
@@ -34,9 +80,15 @@ body, html {
   white-space: pre-wrap;
   box-sizing: border-box;
   scroll-behavior: smooth;
-  padding-bottom: 40px;
+  padding-bottom: 100px;
 }
 
+/* Hidden canvas for capturing frames */
+#canvas {
+  display: none;
+}
+
+/* Bottom buttons */
 .button-container {
   display: flex;
   justify-content: space-between;
@@ -45,10 +97,11 @@ body, html {
   bottom: 0;
   width: 100%;
   background-color: black;
+  gap: 12px;
 }
 
 .button {
-  flex: 1; /* Makes each button take up equal space */
+  flex: 1;
   font-size: 5rem;
   padding: 24px 0;
   color: white;
@@ -63,23 +116,17 @@ body, html {
 }
 
 .button i {
-  pointer-events: none; /* So clicking the icon triggers the button */
+  pointer-events: none; /* clicking icon triggers button */
 }
 
 .button:active {
   background-color: #222;
 }
 
-
-/* Improve touch target spacing and make sure it's responsive */
+/* Responsive touch targets */
 @media (max-width: 480px) {
-    .button {
-      height: 160px;
-      font-size: 4rem;
-    }
+  .button {
+    height: 160px;
+    font-size: 4rem;
   }
-  
-
-  .button-container {
-    gap: 12px;
-  }
+}

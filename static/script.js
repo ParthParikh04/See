@@ -1,4 +1,5 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
+  // DOM elements
   const text = document.getElementById("text");
   const video = document.getElementById("videoFeed");
   const flipButton = document.getElementById("flip-button");
@@ -6,26 +7,35 @@ document.addEventListener("DOMContentLoaded", function () {
   const button2 = document.getElementById("button2");
   const button3 = document.getElementById("button3");
   const backButton = document.getElementById("back-button");
+  const backToSplashButton = document.getElementById("backToSplash");
+  const status = document.getElementById("statusText");
 
   let currentStream = null;
   let currentFacingMode = "environment";
 
-  function displayError(message) {
-    text.style.display = "block";
-    text.textContent = message;
+  // Utility functions
+  const displayError = (msg) => {
+    status.style.display = "block";
+    status.textContent = msg;
     text.scrollTop = text.scrollHeight;
-    speakText(message);
-  }
+    speakText(msg);
+  };
 
-  function stopCurrentStream() {
+  const speakText = (content) => {
+    if ("speechSynthesis" in window) {
+      const utterance = new SpeechSynthesisUtterance(content);
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const stopCurrentStream = () => {
     if (currentStream) {
       currentStream.getTracks().forEach(track => track.stop());
     }
-  }
+  };
 
-  function startWebcam(facingMode = "environment") {
+  const startWebcam = (facingMode = "environment") => {
     stopCurrentStream();
-
     navigator.mediaDevices.getUserMedia({ video: { facingMode } })
       .then((stream) => {
         currentStream = stream;
@@ -33,44 +43,27 @@ document.addEventListener("DOMContentLoaded", function () {
         video.style.display = "block";
         video.style.transform = facingMode === "user" ? "scaleX(-1)" : "scaleX(1)";
       })
-      .catch((error) => {
-        console.error("Error accessing webcam:", error);
+      .catch((err) => {
+        console.error("Webcam error:", err);
         displayError("Unable to access webcam.");
       });
-  }
+  };
 
-  function flipCamera() {
+  const flipCamera = () => {
     currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
     startWebcam(currentFacingMode);
-  }
+  };
 
-  function speakText(textContent) {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(textContent);
-      window.speechSynthesis.speak(utterance);
-    }
-  }
-
-  function show() {
+  const setView = ({ showVideo = false, showButtons = false, showBack = false, showText = false }) => {
     window.speechSynthesis.cancel();
-    video.style.display = "block";
-    button1.style.display = "inline-flex";
-    button2.style.display = "inline-flex";
-    button3.style.display = "inline-flex";
-    flipButton.style.display = "inline-flex";
-    backButton.style.display = "none";
-    text.style.display = "none";
-  }
+    video.style.display = showVideo ? "block" : "none";
+    [button1, button2, button3, flipButton].forEach(btn => btn.style.display = showButtons ? "inline-flex" : "none");
+    backButton.style.display = showBack ? "inline-flex" : "none";
+    text.style.display = showText ? "block" : "none";
+  };
 
-  function replace(query) {
-    window.speechSynthesis.cancel();
-    video.style.display = "none";
-    button1.style.display = "none";
-    button2.style.display = "none";
-    button3.style.display = "none";
-    flipButton.style.display = "none";
-    backButton.style.display = "inline-flex";
-    text.style.display = "none";
+  const replace = (query) => {
+    setView({ showVideo: false, showButtons: false, showBack: true, showText: false });
 
     if (video.readyState < 2) {
       video.addEventListener("loadeddata", () => replace(query), { once: true });
@@ -78,89 +71,75 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    const dataURL = canvas.toDataURL("image/png");
+    canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
 
     fetch("/submit_query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ frame: dataURL, query: query }),
+      body: JSON.stringify({ frame: canvas.toDataURL("image/png"), query }),
     })
-      .then((response) => response.json())
-      .then((result) => {
+      .then(res => res.json())
+      .then(result => {
         text.style.display = "block";
+        text.style.maxHeight = "80vh";
         text.textContent = result.response;
         text.scrollTop = text.scrollHeight;
         speakText(result.response);
       })
-      .catch((error) => {
-        console.error("Error:", error);
+      .catch(err => {
+        console.error("Error:", err);
         displayError("An error occurred.");
       });
-  }
+  };
 
   // Event listeners
-  button1.addEventListener("click", () => 
-    replace("Give me the only text in this image without any introduction or any other information.")
+  backToSplashButton.addEventListener("click", () => {
+    window.speechSynthesis.cancel();
+    window.location.href = "/";
+  });
+
+  button1.addEventListener("click", () =>
+    replace("Give me the only text in this image without any introduction or other info.")
   );
 
-  button2.addEventListener("click", () => 
-    replace("Describe this image briefly but with necessary details. Do not give any preface. Just give me the description.")
+  button2.addEventListener("click", () =>
+    replace("Describe this image briefly but with necessary details. No preface.")
   );
 
   button3.addEventListener("click", () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      displayError("Speech recognition is not supported in this browser.");
-      return;
-    }
-  
+    if (!SpeechRecognition) return displayError("Speech recognition not supported.");
+
     const recognition = new SpeechRecognition();
     recognition.lang = "en-US";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
-  
-    // Show listening message
-    text.style.display = "block";
-    text.textContent = "Listening...";
-    text.scrollTop = text.scrollHeight;
-    console.log("Listening...");
-  
-    recognition.onresult = function (event) {
-      const spokenText = event.results[0][0].transcript;
-      console.log("Heard:", spokenText);
-  
-      // Give time for "Listening..." to render
-      setTimeout(() => replace(spokenText), 100);
-    };
-  
-    recognition.onerror = function (event) {
-      if (event.error === "no-speech") {
-        displayError("No speech detected.");
-      } else {
-        console.error("Speech recognition error:", event.error);
-        displayError("Sorry, I didn't catch that. Try again.");
-      }
-    };
-  
-    recognition.onend = function () {
-      console.log("Speech recognition ended.");
-    };
-  
-    recognition.start();
-  });  
 
-  backButton.addEventListener("click", show);
+    status.style.display = "block";
+    status.textContent = "Listening...";
+
+    recognition.onresult = (event) => {
+      const spokenText = event.results[0][0].transcript;
+      status.style.display = "none";
+      replace(spokenText);
+    };
+
+    recognition.onerror = (event) => {
+      if (event.error === "no-speech") displayError("No speech detected.");
+      else displayError("Sorry, I didn't catch that. Try again.");
+      setTimeout(() => { status.style.display = "none"; }, 2000);
+    };
+
+    recognition.start();
+  });
+
+  backButton.addEventListener("click", () => setView({ showVideo: true, showButtons: true }));
   flipButton.addEventListener("click", flipCamera);
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      replace("Describe this image briefly but with necessary details.");
-    }
+    if (event.key === "Enter") replace("Describe this image briefly but with necessary details.");
   });
 
   startWebcam(currentFacingMode);
